@@ -1,0 +1,200 @@
+#include <SoftwareSerial.h>//Se incluye libreria del modulo
+#include <LedControl.h>//Se incluye libreria
+#include <Adafruit_NeoPixel.h>//Se incluye libreria
+#include <Servo.h>//Se incluye libreria
+
+LedControl lc=LedControl(11,13,10,1);//parametros de matriz led
+Adafruit_NeoPixel tira = Adafruit_NeoPixel(7,12);//parametros de rueda led
+SoftwareSerial sw(2,3);//asignacion de objeto 
+Servo servo;//asignacion de sujeto nuevo
+
+#define demora 1//definir tiempo
+
+byte cero[8]= {				// array que contiene todos los elementos de las
+  B00111000,				// filas necesarias por mostrar el digito cero
+  B01000100,
+  B01000100,
+  B01000100,
+  B01000100,
+  B01000100,
+  B01000100,
+  B00111000
+};
+
+byte uno[8]= {				// array que contiene todos los elementos de las
+  B00010000,				// filas necesarias por mostrar el digito uno
+  B00110000,
+  B00010000,
+  B00010000,
+  B00010000,
+  B00010000,
+  B00010000,
+  B00111000
+};
+
+byte dos[8]= {				// array que contiene todos los elementos de las
+  B00111000,				// filas necesarias por mostrar el digito dos
+  B01000100,
+  B00000100,
+  B00000100,
+  B00001000,
+  B00010000,
+  B00100000,
+  B01111100
+};
+
+const int led1 = 4;//creacion de variable para led
+const int led2 = 5;//creacion de variable para led2
+const int led3 = 6;//creacion de variable para led3
+const int led4 = 7;//creacion de variable para led4
+int valor;
+int valorluces;
+
+char lecturas = 0;//creacion de variable para lectura
+bool estado = 0;//creacion de variable para tipo de estado
+bool estado1 = 0;//creacion de variable para tipo de estado1
+bool estado2 = 0;//creacion de variable para tipo de estado2
+bool estado3 = 0;//creacion de variable para tipo de estado3
+bool estado4 = 0;//creacion de variable para tipo de estado4
+
+void setup() {
+
+Serial.begin(9600);//inicializacion del monitor serial
+sw.begin(9600);//inicializacion del monitor 
+pinMode(led1, OUTPUT);//asignacion de estado de inicio
+pinMode(led2, OUTPUT);//asignacion de estado de inicio
+pinMode(led3, OUTPUT);//asignacion de estado de inicio
+pinMode(led4, OUTPUT);//asignacion de estado de inicio
+lc.shutdown(0,false);			// enciende la matriz
+lc.setIntensity(0,4);			// establece brillo
+lc.clearDisplay(0);			// blanquea matriz
+tira.begin();//inicializacion de tira
+tira.show();//tira led
+servo.attach(8);//asignacion y inicializacion de servo
+
+}
+
+void loop() {
+
+  movimiento();//asigancion de instrucciones
+  cambios();//asigancion de instrucciones
+
+
+  if(sw.available()>0){//creacion de condiciones en if
+  lecturas = sw.read();//asigancion de instrucciones
+  }
+
+  if (sw.available() > 0){//creacion de condiciones en if
+    lecturas = sw.read();//creacion de condiciones en if
+   Serial.println(lecturas);//asigancion de instrucciones
+
+
+   if(lecturas == '1')//creacion de condiciones en if
+   estado=!estado;
+   digitalWrite(led1, estado);//asigancion de instrucciones
+
+
+    if(lecturas == '2')//creacion de condiciones en if
+   estado1=!estado1;
+   digitalWrite(led2, estado1);//asigancion de instrucciones
+
+
+    if(lecturas == '3')//creacion de condiciones en if
+   estado2=!estado2;
+   digitalWrite(led3, estado2);//asigancion de instrucciones
+
+    if(lecturas == '4')//creacion de condiciones en if
+   estado3=!estado3;
+   digitalWrite(led4, estado3);//asigancion de instrucciones
+
+    if(lecturas == '5')//creacion de condiciones en if
+    mostrar_0();				// llama funcion mostrar_0
+    delay(demora);			// demora
+
+    if(lecturas == '6')//creacion de condiciones en if
+    mostrar_1();				// llama funcion mostrar_0
+    delay(demora);			// demora
+
+    if(lecturas == '7')//creacion de condiciones en if
+    mostrar_2();				// llama funcion mostrar_0
+    delay(demora);			// demora
+
+    if(lecturas == '8')//creacion de condiciones en if
+    estandar();//asigancion de instrucciones
+
+  
+  }
+
+}
+
+void mostrar_0(){			// funcion mostrar_0
+  for (int i = 0; i < 8; i++)  		// bucle itera 8 veces por el array
+  {
+    lc.setRow(0,i,cero[i]);		// establece fila con valor de array cero en misma posicion
+
+  }
+}
+
+
+void mostrar_1(){			// funcion mostrar_1
+  for (int i = 0; i < 8; i++) 		// bucle itera 8 veces por el array 
+  {
+    lc.setRow(0,i,uno[i]);		// establece fila con valor de array uno en misma posicion
+
+  }
+}
+
+
+void mostrar_2(){			// funcion mostrar_2
+  for (int i = 0; i < 8; i++)  		// bucle itera 8 veces por el array
+  {
+    lc.setRow(0,i,dos[i]);		// establece fila con valor de array dos en misma posicion
+   
+  }
+}
+
+void estandar(){//creacoin de inst
+  for(int i = 0; i<7; i = i+2) {//asigancion de instrucciones
+    tira.clear();//asigancion de instrucciones
+    tira.setBrightness(100);//asigancion de instrucciones luminocidad
+    tira.setPixelColor(i, 230,250,5);//asigancion de instrucciones de color
+    tira.show();//asigancion de instrucciones
+    delay(100);//asigancion de tirmpo
+    tira.setPixelColor(i, 0,0,0);//asigancion de instrucciones color
+
+  }
+
+}
+
+
+void movimiento(){//creacoin de inst
+  while (sw.available() > 0) {//asigancion de instrucciones
+   valor = sw.read();//asigancion de instrucciones de mapeo
+   Serial.println(valor);//asigancion de instrucciones de imprentacion
+   servo.write(valor);//asigancion de instrucciones ejecucion 
+  }
+}
+
+void cambios(){//se crea la variable para los cambios en las leds
+  if (sw.available() > 0){//que si el bluetoo es mayor que cero
+  valorluces = sw.read();//valor_luces sea a lee el bluetoo
+  Serial.println(valorluces);//imprima el valor_luces
+
+  if(valorluces >= 190){//si luces es mayor e igual a 190
+  digitalWrite(led1,HIGH);//este encienda la led1
+  }
+
+  if(valorluces >= 200){//si luces es mayor e igual a 200
+  digitalWrite(led2,HIGH);//este encienda la led2
+  }
+
+  if(valorluces >= 215)//si luces es mayor e igual a 215
+  {
+  digitalWrite(led3,HIGH);//este encienda la led3
+  }
+  if(valorluces >= 235)//si luces es mayor e igual a 235
+  {
+  digitalWrite(led4,HIGH);//este encienda la led4
+   } 
+  }
+}
